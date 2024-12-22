@@ -14,7 +14,6 @@ class EcommerceSpider(scrapy.Spider):
 
     def parse(self, response):
         if response.url in self.visited_urls:
-            print("Already visited: ", response.url)
             return
         self.visited_urls.add(response.url)
         
@@ -27,10 +26,8 @@ class EcommerceSpider(scrapy.Spider):
                     self.visited_urls.add(full_link)
         
         pagination_links = response.xpath('//a[contains(@href, "/page/")]/@href').getall()
-        print("Pagination links: ", pagination_links)
         for link in pagination_links:
             full_link = response.urljoin(link)
             if full_link not in self.visited_urls:
-                print("Visited URL: ", full_link)
                 yield scrapy.Request(url=full_link, callback=self.parse)
         
