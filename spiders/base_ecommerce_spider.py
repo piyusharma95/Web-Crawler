@@ -22,14 +22,14 @@ NON_PRODUCT_PATTERNS = {
 class BaseEcommerceSpider(scrapy.Spider):
     name = 'base_ecommerce_spider'
     allowed_domains = [
-        # 'scrapingcourse.com',
-        # 'sandbox.oxylabs.io',
+        'scrapingcourse.com',
+        'sandbox.oxylabs.io',
         'webscraper.io'
     ]
     start_urls = [
-        # 'https://www.scrapingcourse.com/ecommerce/',
-        # 'https://sandbox.oxylabs.io/products',
-        # 'https://webscraper.io/test-sites/e-commerce/static',
+        'https://www.scrapingcourse.com/ecommerce/',
+        'https://sandbox.oxylabs.io/products',
+        'https://webscraper.io/test-sites/e-commerce/static',
     ]
     visited_urls = set()
     max_depth = 5 # maximum depth to explore the website

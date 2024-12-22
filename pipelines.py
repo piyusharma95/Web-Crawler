@@ -36,3 +36,28 @@ class DomainToJsonPipeline:
         # Write to a JSON file
         with open('output.json', 'w', encoding='utf-8') as f:
             json.dump(final_data, f, indent=2)
+
+
+class DomainLinePipeline:
+    """
+    Writes each product item as a single line of JSON.
+    We'll unify them after all spiders finish.
+    """
+    def open_spider(self, spider):
+        self.file = open('output.ndjson', 'a', encoding='utf-8')
+
+    def close_spider(self, spider):
+        self.file.close()
+
+    def process_item(self, item, spider):
+        product_url = item.get('product_url')
+        if product_url:
+            # Example: also store 'spider' name
+            data = {
+                "product_url": product_url,
+                "spider_name": spider.name,
+            }
+            line = json.dumps(data)
+            self.file.write(line + "\n")
+
+        return item

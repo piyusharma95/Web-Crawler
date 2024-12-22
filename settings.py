@@ -68,7 +68,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   "ecommerce_crawler.pipelines.DomainToJsonPipeline": 300,
+   # "ecommerce_crawler.pipelines.DomainToJsonPipeline": 300,
+   "ecommerce_crawler.pipelines.DomainLinePipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -93,7 +94,7 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 #HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 # Set settings whose default value is deprecated to a future-proof value
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+# TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 import os
