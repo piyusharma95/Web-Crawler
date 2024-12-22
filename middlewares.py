@@ -2,8 +2,14 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+import os
 import random
+
 from scrapy import signals
+from scrapy.http.response.html import HtmlResponse
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -113,3 +119,39 @@ class RandomUserAgentMiddleware:
     def process_request(self, request, spider):
         request.headers['User-Agent'] = random.choice(self.USER_AGENTS)
 
+
+class CustomSeleniumMiddleware:
+    def __init__(self, driver_path, driver_args):
+        chrome_options = Options()
+        for arg in driver_args:
+            chrome_options.add_argument(arg)
+        
+        service = ChromeService(executable_path=driver_path)
+        self.driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        driver_path = os.path.join(os.path.dirname(__file__), 'chromedriver.exe')
+        driver_args = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS', ['--headless'])
+        middleware = cls(driver_path, driver_args)
+        crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
+        crawler.signals.connect(middleware.spider_closed, signal=signals.spider_closed)
+        return middleware
+
+    def process_request(self, request, spider):
+        self.driver.get(request.url)
+        body = self.driver.page_source
+        
+        return HtmlResponse(
+            self.driver.current_url,
+            body=body,
+            encoding='utf-8',
+            request=request
+        )
+    
+    def spider_opened(self, spider):
+        # Assign the WebDriver instance to the spider
+        spider.driver = self.driver
+
+    def spider_closed(self):
+        self.driver.quit()

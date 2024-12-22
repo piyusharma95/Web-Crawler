@@ -1,7 +1,7 @@
 import scrapy
 from w3lib.url import url_query_cleaner
 
-from parse_utils import (
+from .parse_utils import (
     extract_product_links,
     extract_pagination_links,
     extract_other_links
@@ -29,10 +29,7 @@ class BaseEcommerceSpider(scrapy.Spider):
     start_urls = [
         # 'https://www.scrapingcourse.com/ecommerce/',
         # 'https://sandbox.oxylabs.io/products',
-        # 'https://webscraper.io/test-sites/e-commerce/allinone',
         # 'https://webscraper.io/test-sites/e-commerce/static',
-        'https://webscraper.io/test-sites/e-commerce/ajax',
-        
     ]
     visited_urls = set()
     max_depth = 5 # maximum depth to explore the website
@@ -45,7 +42,7 @@ class BaseEcommerceSpider(scrapy.Spider):
         for url in self.start_urls:
             yield scrapy.Request(
                 url=url,
-                callback=self.parse,
+                callback=self.parse_listing,
                 meta={'root_url': url, 'depth': 0},
             )
 
@@ -58,9 +55,10 @@ class BaseEcommerceSpider(scrapy.Spider):
         """
         root_url = response.meta['root_url']
         depth = response.meta['depth']
-        
+        print(f"Depth: {depth}, URL: {response.url}")
         # deduplication using cleaned URL but keeping the page parameter
         cleaned_url = url_query_cleaner(response.url, parameterlist=('page'))
+        print(f"Cleaned URL: {cleaned_url}")
         if cleaned_url in self.visited_urls or depth > self.max_depth:
             return
         self.visited_urls.add(cleaned_url)
@@ -69,17 +67,18 @@ class BaseEcommerceSpider(scrapy.Spider):
         product_links = extract_product_links(
             response, URL_PATTERNS, NON_PRODUCT_PATTERNS
         )
+        print(f"Product links: {product_links}")
         for link in product_links:
             if link not in self.visited_urls:
                 self.visited_urls.add(link)
                 yield {
                     "product_url": link
-                    # Or yield a request to parse detail:
                     # yield scrapy.Request(link, callback=self.parse_detail)
                 }
 
         # Pagination links
         pagination_links = extract_pagination_links(response)
+        print(f"Pagination links: {pagination_links}")
         for link in pagination_links:
             if link not in self.visited_urls:
                 yield scrapy.Request(
@@ -90,6 +89,7 @@ class BaseEcommerceSpider(scrapy.Spider):
 
         # Explore other links (categories, etc.)
         other_links = extract_other_links(response, root_url)
+        print(f"Other links: {other_links}")
         for link in other_links:
             if link not in self.visited_urls:
                 yield scrapy.Request(

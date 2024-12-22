@@ -56,6 +56,7 @@ DOWNLOADER_MIDDLEWARES = {
    # "ecommerce_crawler.middlewares.EcommerceCrawlerDownloaderMiddleware": 543,
    'ecommerce_crawler.middlewares.RandomUserAgentMiddleware': 400,
    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+   'ecommerce_crawler.middlewares.CustomSeleniumMiddleware': 800
 }
 
 # Enable or disable extensions
@@ -94,3 +95,9 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Set settings whose default value is deprecated to a future-proof value
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+import os
+
+SELENIUM_DRIVER_NAME = 'chrome'
+SELENIUM_DRIVER_EXECUTABLE_PATH = os.path.join(os.path.dirname(__file__), 'chromedriver.exe')
+SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # run headless for better performance
