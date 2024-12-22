@@ -55,10 +55,10 @@ class BaseEcommerceSpider(scrapy.Spider):
         """
         root_url = response.meta['root_url']
         depth = response.meta['depth']
-        print(f"Depth: {depth}, URL: {response.url}")
+        
         # deduplication using cleaned URL but keeping the page parameter
         cleaned_url = url_query_cleaner(response.url, parameterlist=('page'))
-        print(f"Cleaned URL: {cleaned_url}")
+        
         if cleaned_url in self.visited_urls or depth > self.max_depth:
             return
         self.visited_urls.add(cleaned_url)
@@ -67,7 +67,7 @@ class BaseEcommerceSpider(scrapy.Spider):
         product_links = extract_product_links(
             response, URL_PATTERNS, NON_PRODUCT_PATTERNS
         )
-        print(f"Product links: {product_links}")
+        
         for link in product_links:
             if link not in self.visited_urls:
                 self.visited_urls.add(link)
@@ -78,7 +78,7 @@ class BaseEcommerceSpider(scrapy.Spider):
 
         # Pagination links
         pagination_links = extract_pagination_links(response)
-        print(f"Pagination links: {pagination_links}")
+        
         for link in pagination_links:
             if link not in self.visited_urls:
                 yield scrapy.Request(
@@ -89,7 +89,7 @@ class BaseEcommerceSpider(scrapy.Spider):
 
         # Explore other links (categories, etc.)
         other_links = extract_other_links(response, root_url)
-        print(f"Other links: {other_links}")
+        
         for link in other_links:
             if link not in self.visited_urls:
                 yield scrapy.Request(

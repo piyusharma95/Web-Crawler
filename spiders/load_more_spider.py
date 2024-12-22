@@ -31,16 +31,13 @@ class LoadMoreSpider(BaseEcommerceSpider):
         - Then pass that HTML to our normal parse logic
         """
         if not response.css('.ecomerce-items-scroll-more'):
-            print(f"************ No 'Load More' button found on {response.url} ************")
             # Reuse the base logic
             yield from super().parse_listing(response)
         else:
-            print(f"############### 'Load More' button found on {response.url} ###############")
-            
             driver = self.driver
 
             self.remove_cookie_banner(driver)
-            print("Response URL: ", response.url)
+            
             count = 0
             while True:
                 try:
@@ -51,13 +48,13 @@ class LoadMoreSpider(BaseEcommerceSpider):
                     from selenium.webdriver import ActionChains
                     ActionChains(driver).move_to_element(load_more_button).click().perform()
                     # driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
-                    time.sleep(1)
+                    time.sleep(2)
                     load_more_button.click()
                     count += 1
                     self.logger.info(f"{response.url} - 'Load More' clicked {count} times")
 
                 except Exception as e:
-                    print(f"Error clicking 'Load More' button: {e}")
+                    self.logger.info(f"Error clicking 'Load More' button: {e}")
                     break  # Exit the loop if there's no "Load More" button or an error occurs
             
             

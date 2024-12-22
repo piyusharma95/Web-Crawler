@@ -50,14 +50,7 @@ class DomainLinePipeline:
         self.file.close()
 
     def process_item(self, item, spider):
-        product_url = item.get('product_url')
-        if product_url:
-            # Example: also store 'spider' name
-            data = {
-                "product_url": product_url,
-                "spider_name": spider.name,
-            }
-            line = json.dumps(data)
-            self.file.write(line + "\n")
-
+        # Each item is written as a single line of JSON
+        line = json.dumps(dict(item))
+        self.file.write(line + "\n")
         return item
